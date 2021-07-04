@@ -1,0 +1,134 @@
+﻿@model OcellicsFundApp.ViewModels.FundDetailsViewModel
+@{
+    ViewBag.Title = Model.Fund.Name;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="jumbotron">
+    <h2>@Model.Fund.Name</h2>
+    <h3>@Model.Fund.Category.Name</h3>
+</div>
+
+
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+<script src="https://code.highcharts.com/stock/modules/data.js"></script>
+<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+
+<h3>Growth of a R100,000 Investment at Inception</h3>
+
+<div id="container" style="height: 400px; min-width: 310px; margin-top: 20px"></div>
+
+
+@section scripts
+{
+    <script>
+    $(document).ready(function () {
+        $.getJSON("/api/fund/@Model.Fund.Id", function (data) {
+            var monthlyReturnList = new Array();
+            var initial = 100000;
+           
+            for (var i = data.length - 1; i >= 0; i--) {
+                var monthlyReturn = new Array();
+
+                monthlyReturn.push(new Date(data[i].effectiveDate).getTime());
+                initial *= (1 + data[i].monthToDate);
+                monthlyReturn.push(initial);
+                monthlyReturnList.push(monthlyReturn);
+            }
+            console.log(monthlyReturnList);
+            Highcharts.setOptions({
+                global: {
+                    useUTC: false
+                }
+            });
+            // Create the chart
+            Highcharts.stockChart('container', {
+
+
+                rangeSelector: {
+                    selected: 6
+                },
+
+                xAxis: {
+                    type: 'datetime' //ensures that xAxis is treated as datetime values
+                },
+
+                yAxis: {
+                    type: 'percent' //ensures that xAxis is treated as datetime values
+                },
+
+                series: [{
+                    data: monthlyReturnList,
+                    tooltip: {
+                        valueDecimals: 2
+                    }
+                }]
+            });
+
+
+
+        });
+    });
+
+
+    </script>
+}
+
+<p>
+    <h4>Perfomance Summary as of @Model.MonthlyReturns.First().EffectiveDate.ToString("dd/MM/yyyy")</h4>
+</p>
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Period</th>
+            <th>Fund</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>3 Months</td>
+            <td>@String.Format("{0:P4}", Model.MonthlyReturns.First().ThreeMonth)</td>
+        </tr>
+        <tr>
+            <td>Six Months</td>
+            <td>@String.Format("{0:P4}", Model.MonthlyReturns.First().SixMonth)</td>
+        </tr>
+        <tr>
+            <td>Year to Date</td>
+            <td>@String.Format("{0:P4}", Model.MonthlyReturns.First().YearToDate)</td>
+        </tr>
+        <tr>
+            <td>One Year</td>
+            <td>@String.Format("{0:P4}", Model.MonthlyReturns.First().OneYear)</td>
+        </tr>
+        <tr>
+            <td>Two Year (Annualised)</td>
+            <td>@String.Format("{0:P4}", Model.MonthlyReturns.First().TwoYear)</td>
+        </tr>
+        <tr>
+            <td>Since Inception (Annualised)</td>
+            <td>@String.Format("{0:P4}", Model.MonthlyReturns.First().SinceInception)</td>
+        </tr>
+
+    </tbody>
+</table>
+
+<p>
+    Data for the Annualised Performance Report, Annualised Volatility Report and Risk-Adjusted Return Report for the following
+    periods (as columns) for each fund: Month-To-Date, 3-Month, 6-Month, Year-To-Date, 1-Year, 2-Year and Since-Inception can be found below.
+</p>
+
+<div class="row">
+    <div class="col-md-4">
+        <p><a class="btn btn-default" href="@Model.Fund.Id/AnnualisedPerformance">Annualised Performance Report &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <p><a class="btn btn-default" href="@Model.Fund.Id/AnnualisedVolatility">Annualised Volatility Report &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <p><a class="btn btn-default" href="@Model.Fund.Id/RiskAdjusted">Risk-Adjusted Return Report &raquo;</a></p>
+    </div>
+</div>

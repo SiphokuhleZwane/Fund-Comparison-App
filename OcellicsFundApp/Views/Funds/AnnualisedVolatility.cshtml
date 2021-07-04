@@ -1,0 +1,49 @@
+﻿@model OcellicsFundApp.ViewModels.FundDetailsViewModel
+@{
+    ViewBag.Title = "Annualised Volatility";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<p>
+    <h2>Annualised Volatility Report</h2>
+    <h4>@Model.Fund.Name</h4>
+</p>
+
+<table id="table_id" class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Effective Date</th>
+            <th>Month to Date</th>
+            <th>3 Month</th>
+            <th>6 Month</th>
+            <th>Year to Date</th>
+            <th>One Year</th>
+            <th>Two Year</th>
+            <th>Since Inception</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var MonthlyReturn in Model.MonthlyReturns)
+        {
+            <tr>
+                <td>@MonthlyReturn.EffectiveDate.ToShortDateString().Reverse()</td>
+                <td>@String.Format("{0:P4}", MonthlyReturn.MonthToDate)</td>
+                <td>@String.Format("{0:P4}", MonthlyReturn.ThreeMonthVolatility)</td>
+                <td>@String.Format("{0:P4}", MonthlyReturn.SixMonthVolatility)</td>
+                <td>@String.Format("{0:P4}", MonthlyReturn.YearToDateVolatility)</td>
+                <td>@String.Format("{0:P4}", MonthlyReturn.OneYearVolatility)</td>
+                <td>@String.Format("{0:P4}", MonthlyReturn.TwoYearVolatility)</td>
+                <td>@String.Format("{0:P4}", MonthlyReturn.SinceInceptionVolatility)</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            $('#table_id').DataTable();
+        });
+    </script>
+}

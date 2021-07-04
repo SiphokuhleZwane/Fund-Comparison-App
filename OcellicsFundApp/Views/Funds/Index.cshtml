@@ -1,0 +1,39 @@
+﻿@model IEnumerable<OcellicsFundApp.Models.Fund>
+@{
+    ViewBag.Title = "Funds";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<p>
+    <h2>List of Funds</h2>
+</p>
+
+<table id="table_id" class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Fund</th>
+            <th>Category</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var fund in Model)
+        {
+            <tr>
+                <td>@Html.ActionLink(fund.Name, "Details", "Funds", new { id = fund.Id }, null)</td>
+                <td>@fund.Category.Name</td>
+            </tr>
+        }
+    </tbody>
+
+
+</table>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            $('#table_id').DataTable();
+        });
+    </script>
+}
+
